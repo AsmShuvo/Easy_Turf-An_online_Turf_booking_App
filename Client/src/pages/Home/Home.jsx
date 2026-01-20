@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Home = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [city, setCity] = useState("");
   const [slot, setSlot] = useState("");
 
-  const cities = ["Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna"];
+  const cities = ["Banani", "Gulshan", "Uttara", "Dhanmondi", "Mirpur"];
   const slots = [
     "10-11",
     "11-12",
@@ -30,6 +32,16 @@ const Home = () => {
     "https://plus.unsplash.com/premium_photo-1661820628813-48f19dfad8dc?q=80&w=687&auto=format&fit=crop";
   const imgRight =
     "https://plus.unsplash.com/premium_photo-1664297521832-0ea5ea948a67?q=80&w=687&auto=format&fit=crop";
+
+  const handleSearch = () => {
+    navigate("/turfs", {
+      state: {
+        city,
+        selectedDate,
+        slot,
+      },
+    });
+  };
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen text-white font-sans selection:bg-lime-400 selection:text-black">
@@ -102,7 +114,7 @@ const Home = () => {
                       className="w-full bg-white/5 border border-white/10 p-4 rounded-xl focus:border-lime-400 outline-none transition-all text-white appearance-none"
                     >
                       <option value="" className="bg-black">
-                        Choose City
+                        Choose Place
                       </option>
                       {cities.map((c) => (
                         <option key={c} value={c} className="bg-black">
@@ -133,7 +145,10 @@ const Home = () => {
                 </div>
               </div>
 
-              <button className="w-full py-5 bg-lime-400 hover:bg-lime-300 text-black font-black uppercase tracking-widest rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_-5px_rgba(163,230,53,0.5)]">
+              <button
+                onClick={handleSearch}
+                className="w-full py-5 bg-lime-400 hover:bg-lime-300 text-black font-black uppercase tracking-widest rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_-5px_rgba(163,230,53,0.5)]"
+              >
                 Search
               </button>
             </div>
