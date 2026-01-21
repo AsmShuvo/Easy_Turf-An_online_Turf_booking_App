@@ -1,1 +1,2 @@
 <Outlet /> acts as a placeholder in a parent component where the child route's component will be rendered.
+onAuthStateChanged
