@@ -8,12 +8,16 @@ import {
   ChevronRight,
   Search,
 } from "lucide-react";
+import BookingModal from "../../components/BookingModal";
 
 const Turfs = () => {
   const [turfs, setTurfs] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [selectedTurf, setSelectedTurf] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Destructure state passed from Home search
   const { city, selectedDate, slot } = location.state || {};
@@ -184,7 +188,13 @@ const Turfs = () => {
                     </div>
 
                     {/* Action Button */}
-                    <button className="mt-auto group/btn relative w-full py-4 overflow-hidden rounded-xl border border-lime-400/30 hover:border-lime-400 transition-colors">
+                    <button
+                      onClick={() => {
+                        setSelectedTurf(turf);
+                        setIsModalOpen(true);
+                      }}
+                      className="mt-auto group/btn relative w-full py-4 overflow-hidden rounded-xl border border-lime-400/30 hover:border-lime-400 transition-colors"
+                    >
                       <div className="absolute inset-0 bg-lime-400 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                       <div className="relative flex items-center justify-center space-x-2 text-lime-400 group-hover/btn:text-black font-black uppercase tracking-[0.2em] text-xs">
                         <span>Book Now</span>
@@ -198,6 +208,15 @@ const Turfs = () => {
           </div>
         )}
       </div>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        turf={selectedTurf}
+        slot={slot}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 };
