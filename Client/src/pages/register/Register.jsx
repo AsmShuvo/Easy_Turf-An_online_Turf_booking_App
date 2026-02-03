@@ -42,7 +42,37 @@ const Register = () => {
       setError("");
       setIsSubmitting(true);
       await signup(formData.email, formData.password);
-      // Here you might want to save additional user info (name, phone) to a database
+
+      // Save user info to PostgreSQL database
+      try {
+        const response = await fetch("http://localhost:3000/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password, // Note: In a real app, ensure security practices for password handling
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(
+            "Failed to sync user to database:",
+            response.status,
+            errorText,
+          );
+          alert(`Database Sync Failed: ${response.status} - ${errorText}`);
+        } else {
+          console.log("User synced to database successfully");
+        }
+      } catch (dbError) {
+        console.error("Database sync error:", dbError);
+        alert(`Database Connection Error: ${dbError.message}`);
+      }
+
       navigate("/");
     } catch (err) {
       setError("Failed to create account: " + err.message);
