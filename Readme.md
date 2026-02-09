@@ -45,6 +45,12 @@ EasyTurf is a high-performance, full-stack web application designed for seamless
 
 ---
 
+## 📉 Database ER Diagram
+
+![ER Diagram](https://raw.githubusercontent.com/AsmShuvo/Easy_Turf-An_online_Turf_booking_App/refs/heads/main/Client/public/images/ER.PNG)
+
+---
+
 ## ⚙️ Local Setup
 
 ### 1. Clone the repository
