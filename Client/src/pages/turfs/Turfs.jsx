@@ -9,8 +9,11 @@ import {
   Search,
 } from "lucide-react";
 import BookingModal from "../../components/BookingModal";
+import PaymentModal from "../../components/PaymentModal";
+import { useAuth } from "../../Providers/AuthProvider";
 
 const Turfs = () => {
+  const { user } = useAuth();
   const [turfs, setTurfs] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -18,6 +21,8 @@ const Turfs = () => {
 
   const [selectedTurf, setSelectedTurf] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [bookingData, setBookingData] = useState(null);
 
   const { city, selectedDate, slot } = location.state || {};
   const server_url = import.meta.env.VITE_SERVER_URL;
@@ -199,16 +204,34 @@ const Turfs = () => {
 
                     {/* Action Button */}
                     <button
+                      disabled={!user}
                       onClick={() => {
+                        if (!user) return;
                         setSelectedTurf(turf);
                         setIsModalOpen(true);
                       }}
-                      className="mt-auto group/btn relative w-full py-4 overflow-hidden rounded-xl border border-lime-400/30 hover:border-lime-400 transition-colors"
+                      className={`mt-auto group/btn relative w-full py-4 overflow-hidden rounded-xl border border-lime-400/30 transition-colors ${
+                        !user
+                          ? "opacity-50 cursor-not-allowed hover:border-red-500/30"
+                          : "hover:border-lime-400"
+                      }`}
                     >
-                      <div className="absolute inset-0 bg-lime-400 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
-                      <div className="relative flex items-center justify-center space-x-2 text-lime-400 group-hover/btn:text-black font-black uppercase tracking-[0.2em] text-xs">
-                        <span>Book Now</span>
-                        <ChevronRight size={16} />
+                      <div
+                        className={`absolute inset-0 ${
+                          !user ? "bg-red-500/10" : "bg-lime-400"
+                        } translate-y-full ${
+                          user ? "group-hover/btn:translate-y-0" : ""
+                        } transition-transform duration-300`}
+                      />
+                      <div
+                        className={`relative flex items-center justify-center space-x-2 ${
+                          !user ? "text-gray-500" : "text-lime-400"
+                        } ${
+                          user ? "group-hover/btn:text-black" : ""
+                        } font-black uppercase tracking-[0.2em] text-xs`}
+                      >
+                        <span>{user ? "Book Now" : "Login Required"}</span>
+                        {user && <ChevronRight size={16} />}
                       </div>
                     </button>
                   </div>
@@ -223,9 +246,56 @@ const Turfs = () => {
       <BookingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSubmit={(data) => {
+          setBookingData(data);
+          setIsModalOpen(false);
+          setIsPaymentModalOpen(true);
+        }}
         turf={selectedTurf}
         slot={slot}
         selectedDate={selectedDate}
+      />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        amount={selectedTurf?.rent}
+        onSubmit={async (paymentInfo) => {
+          setIsPaymentModalOpen(false);
+
+          // Format date to DD/MM/YYYY
+          const dateObj = new Date(bookingData.selectedDate);
+          const formattedDate = dateObj.toLocaleDateString("en-GB");
+
+          const payload = {
+            ...bookingData,
+            date: formattedDate, // Backend expects 'date'
+            paymentMethod: paymentInfo.method,
+            transactionId: paymentInfo.transactionId,
+            userEmail: user.email,
+          };
+
+          try {
+            const res = await fetch(`${server_url}/bookings`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+              alert(result.message);
+              // Optionally refresh data to show updated slots
+              navigate("/"); // Redirect or refresh
+            } else {
+              alert("Booking Failed: " + result.error);
+            }
+          } catch (error) {
+            console.error("Booking Error:", error);
+            alert("Something went wrong!");
+          }
+        }}
       />
     </div>
   );

@@ -10,21 +10,28 @@ import {
   Send,
 } from "lucide-react";
 
-const BookingModal = ({ isOpen, onClose, turf, slot, selectedDate }) => {
+const BookingModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  turf,
+  slot,
+  selectedDate,
+}) => {
   if (!isOpen || !turf) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-    console.log("Booking Data:", {
+
+    // Pass data to parent handler
+    onSubmit({
       ...data,
       turfId: turf.id,
       slot,
       selectedDate,
     });
-    alert("Booking request submitted! (Check console for details)");
-    onClose();
   };
 
   return (
@@ -186,7 +193,7 @@ const BookingModal = ({ isOpen, onClose, turf, slot, selectedDate }) => {
               className="group relative w-full py-4 mt-4 overflow-hidden rounded-xl border border-lime-400/30 bg-lime-400 text-black font-black uppercase tracking-[0.2em] text-xs hover:shadow-[0_0_30px_rgba(163,230,53,0.3)] transition-all"
             >
               <div className="relative flex items-center justify-center space-x-2">
-                <span>Confirm Booking</span>
+                <span>Continue to Payment</span>
                 <Send size={16} />
               </div>
             </button>
