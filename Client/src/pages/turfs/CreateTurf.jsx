@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import api from "../../api/axios";
 
 const CreateTurf = () => {
   const navigate = useNavigate();
@@ -38,40 +39,22 @@ const CreateTurf = () => {
         rent: parseFloat(formData.rent),
       };
 
-      const res = await fetch("http://localhost:3000/turfs", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      await api.post("/turfs", payload);
 
-      if (res.ok) {
-        await Swal.fire({
-          title: "Arena Active",
-          text: "Tactical deployment completed successfully.",
-          icon: "success",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#a3e635",
-        });
-        navigate("/turfs");
-      } else {
-        const errorData = await res.json();
-        Swal.fire({
-          title: "Deployment Failed",
-          text: errorData.error,
-          icon: "error",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#ef4444",
-        });
-      }
+      await Swal.fire({
+        title: "Arena Active",
+        text: "Tactical deployment completed successfully.",
+        icon: "success",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#a3e635",
+      });
+      navigate("/turfs");
     } catch (error) {
       console.error("Error creating turf:", error);
       Swal.fire({
-        title: "System Error",
-        text: "Command rejected by server",
+        title: "Deployment Failed",
+        text: error.response?.data?.error || "Command rejected by server",
         icon: "error",
         background: "#050505",
         color: "#fff",

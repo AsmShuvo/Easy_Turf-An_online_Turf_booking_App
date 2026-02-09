@@ -8,29 +8,22 @@ import {
   CreditCard,
   Hash,
 } from "lucide-react";
+import api from "../../api/axios";
+import { useQuery } from "@tanstack/react-query";
 
 const OrderHistory = () => {
   const { user } = useAuth();
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const server_url = import.meta.env.VITE_SERVER_URL;
 
-  useEffect(() => {
-    if (user?.email) {
-      fetch(`${server_url}/bookings/user/${user.email}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setBookings(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching bookings:", err);
-          setLoading(false);
-        });
-    }
-  }, [user, server_url]);
+  const { data: bookings = [], isLoading } = useQuery({
+    queryKey: ["order-history", user?.email],
+    queryFn: async () => {
+      const res = await api.get(`/bookings/user/${user.email}`);
+      return res.data;
+    },
+    enabled: !!user?.email,
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col justify-center items-center text-white">
         <Activity className="text-lime-400 animate-spin mb-4" size={48} />

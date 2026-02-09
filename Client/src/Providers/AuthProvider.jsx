@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext, useMemo } from "react";
 import { auth } from "../firebase";
+import api from "../api/axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -24,19 +25,12 @@ export function AuthProvider({ children }) {
       if (currentUser) {
         try {
           console.log("Fetching role for:", currentUser.email);
-          const response = await fetch(
-            `http://localhost:3000/users/${currentUser.email}`,
-          );
-          if (response.ok) {
-            const dbUser = await response.json();
-            console.log("Fetched Role Data:", dbUser);
-            setUser({ ...currentUser, ...dbUser });
-          } else {
-            setUser(currentUser);
-          }
+          const response = await api.get(`/users/${currentUser.email}`);
+          console.log("Fetched Role Data:", response.data);
+          setUser({ ...currentUser, ...response.data }); // Merge Firebase user with DB user (role)
         } catch (error) {
           console.error("Failed to fetch user role:", error);
-          setUser(currentUser);
+          setUser(currentUser); // Set user even if role fetch fails
         }
       } else {
         setUser(null);

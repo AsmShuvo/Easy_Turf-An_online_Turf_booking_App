@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../Providers/AuthProvider";
 import Swal from "sweetalert2";
+import api from "../../api/axios";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -46,46 +47,34 @@ const Register = () => {
 
       // Save user info to PostgreSQL database
       try {
-        const response = await fetch("http://localhost:3000/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password, // Note: In a real app, ensure security practices for password handling
-          }),
+        await api.post("/users", {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
         });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(
-            "Failed to sync user to database:",
-            response.status,
-            errorText,
-          );
+        console.log("User synced to database successfully");
+      } catch (dbError) {
+        console.error("Database sync error:", dbError);
+        const status = dbError.response?.status;
+        if (status) {
           Swal.fire({
             title: "Database Out of Sync",
-            text: `Local setup completed but remote sync failed: ${response.status}`,
+            text: `Local setup completed but remote sync failed: ${status}`,
             icon: "warning",
             background: "#050505",
             color: "#fff",
             confirmButtonColor: "#f59e0b",
           });
         } else {
-          console.log("User synced to database successfully");
+          Swal.fire({
+            title: "Connection Error",
+            text: "Identity verified but database link offline",
+            icon: "error",
+            background: "#050505",
+            color: "#fff",
+            confirmButtonColor: "#ef4444",
+          });
         }
-      } catch (dbError) {
-        console.error("Database sync error:", dbError);
-        Swal.fire({
-          title: "Connection Error",
-          text: "Identity verified but database link offline",
-          icon: "error",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#ef4444",
-        });
       }
 
       await Swal.fire({

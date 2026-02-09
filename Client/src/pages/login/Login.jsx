@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Activity, ShieldCheck } from "lucide-react";
 import { useAuth } from "../../Providers/AuthProvider";
+import api from "../../api/axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,17 +27,12 @@ const Login = () => {
       // Note: login() updates auth state, but we might need to fetch role manually here
       // or rely on a slight delay/check.
       // Better: fetch role directly here for immediate decision.
-      const response = await fetch(`http://localhost:3000/users/${email}`);
-      if (response.ok) {
-        const dbUser = await response.json();
-        console.log("User: ", dbUser);
-        if (dbUser.role === "admin") {
-          navigate("/dashboard");
-        } else {
-          navigate("/");
-        }
+      const response = await api.get(`/users/${email}`);
+      const dbUser = response.data;
+      console.log("User: ", dbUser);
+      if (dbUser.role === "admin") {
+        navigate("/dashboard");
       } else {
-        // Fallback if fetch fails
         navigate("/");
       }
     } catch (err) {

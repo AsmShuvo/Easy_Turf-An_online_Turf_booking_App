@@ -13,88 +13,96 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../Providers/AuthProvider";
 import Swal from "sweetalert2";
+import api from "../../api/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const AdminDashboard = () => {
-  const [bookings, setBookings] = useState([]);
-  const [turfs, setTurfs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("ALL"); // ALL, PENDING, CONFIRMED
-  const server_url = import.meta.env.VITE_SERVER_URL;
+  const queryClient = useQueryClient();
+  const [filter, setFilter] = useState("ALL");
+  const { user } = useAuth();
 
-  const { user } = useAuth(); // Get user to access (db) id
+  // Fetch Bookings
+  const { data: bookings = [], isLoading: isBookingsLoading } = useQuery({
+    queryKey: ["bookings", user?.id],
+    queryFn: async () => {
+      const res = await api.get(`/bookings?ownerId=${user.id}`);
+      return res.data;
+    },
+    enabled: !!user?.id,
+  });
 
-  useEffect(() => {
-    if (!user || !user.id) return;
+  // Fetch Turfs
+  const { data: turfs = [], isLoading: isTurfsLoading } = useQuery({
+    queryKey: ["turfs", user?.id],
+    queryFn: async () => {
+      const res = await api.get(`/turfs?ownerId=${user.id}`);
+      return res.data;
+    },
+    enabled: !!user?.id,
+  });
 
-    const fetchData = async () => {
-      try {
-        const [bookingsRes, turfsRes] = await Promise.all([
-          fetch(`${server_url}/bookings?ownerId=${user.id}`),
-          fetch(`${server_url}/turfs?ownerId=${user.id}`),
-        ]);
-
-        const bookingsData = await bookingsRes.json();
-        const turfsData = await turfsRes.json();
-
-        setBookings(bookingsData);
-        setTurfs(turfsData);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to load dashboard data:", err);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [server_url, user]);
-
-  const handleStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      const res = await fetch(`${server_url}/bookings/${bookingId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
+  const statusMutation = useMutation({
+    mutationFn: async ({ bookingId, newStatus }) => {
+      const res = await api.patch(`/bookings/${bookingId}/status`, {
+        status: newStatus,
       });
-
-      if (res.ok) {
-        Swal.fire({
-          title: "Success",
-          text: `Booking ${newStatus === "CONFIRMED" ? "confirmed" : "declined"} successfully`,
-          icon: "success",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#a3e635",
-        });
-        // Update local state
-        setBookings((prev) =>
-          prev.map((b) =>
-            b.id === bookingId ? { ...b, status: newStatus } : b,
-          ),
-        );
-      } else {
-        const errorData = await res.json();
-        Swal.fire({
-          title: "Error",
-          text: errorData.error,
-          icon: "error",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#ef4444",
-        });
-      }
-    } catch (error) {
+      return res.data;
+    },
+    onSuccess: (data, variables) => {
+      Swal.fire({
+        title: "Success",
+        text: `Booking ${variables.newStatus === "CONFIRMED" ? "confirmed" : "declined"} successfully`,
+        icon: "success",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#a3e635",
+      });
+      queryClient.invalidateQueries(["bookings", user?.id]);
+    },
+    onError: (error) => {
       console.error("Error updating status:", error);
       Swal.fire({
-        title: "System Error",
-        text: "Could not connect to command center",
+        title: "Error",
+        text: error.response?.data?.error || "Could not update status",
         icon: "error",
         background: "#050505",
         color: "#fff",
         confirmButtonColor: "#ef4444",
       });
-    }
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (bookingId) => {
+      const res = await api.delete(`/bookings/${bookingId}`);
+      return res.data;
+    },
+    onSuccess: () => {
+      Swal.fire({
+        title: "Deleted!",
+        text: "Booking has been removed and slot is freed.",
+        icon: "success",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#a3e635",
+      });
+      queryClient.invalidateQueries(["bookings", user?.id]);
+    },
+    onError: (error) => {
+      console.error("Error deleting:", error);
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.error || "Operation failed",
+        icon: "error",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
+    },
+  });
+
+  const handleStatusUpdate = (bookingId, newStatus) => {
+    statusMutation.mutate({ bookingId, newStatus });
   };
 
   const handleDelete = async (bookingId) => {
@@ -110,44 +118,8 @@ const AdminDashboard = () => {
       color: "#fff",
     });
 
-    if (!result.isConfirmed) return;
-
-    try {
-      const res = await fetch(`${server_url}/bookings/${bookingId}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        Swal.fire({
-          title: "Deleted!",
-          text: "Booking has been removed and slot is freed.",
-          icon: "success",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#a3e635",
-        });
-        setBookings((prev) => prev.filter((b) => b.id !== bookingId));
-      } else {
-        const errorData = await res.json();
-        Swal.fire({
-          title: "Error",
-          text: errorData.error,
-          icon: "error",
-          background: "#050505",
-          color: "#fff",
-          confirmButtonColor: "#ef4444",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting:", error);
-      Swal.fire({
-        title: "System Error",
-        text: "Operation failed",
-        icon: "error",
-        background: "#050505",
-        color: "#fff",
-        confirmButtonColor: "#ef4444",
-      });
+    if (result.isConfirmed) {
+      deleteMutation.mutate(bookingId);
     }
   };
 
@@ -163,7 +135,7 @@ const AdminDashboard = () => {
     totalTurfs: turfs.length,
   };
 
-  if (loading) {
+  if (isBookingsLoading || isTurfsLoading) {
     return (
       <div className="h-full flex flex-col justify-center items-center text-white">
         <Activity className="text-lime-400 animate-spin mb-4" size={48} />

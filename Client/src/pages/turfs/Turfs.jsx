@@ -12,11 +12,12 @@ import BookingModal from "../../components/BookingModal";
 import PaymentModal from "../../components/PaymentModal";
 import { useAuth } from "../../Providers/AuthProvider";
 import Swal from "sweetalert2";
+import api from "../../api/axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Turfs = () => {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [turfs, setTurfs] = useState([]);
-  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -26,69 +27,74 @@ const Turfs = () => {
   const [bookingData, setBookingData] = useState(null);
 
   const { city, selectedDate, slot } = location.state || {};
-  const server_url = import.meta.env.VITE_SERVER_URL;
-  useEffect(() => {
-    fetch(`${server_url}/turfs`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        let filteredData = data;
 
-        // 1. Filter by City
-        if (city && city !== "All") {
-          filteredData = filteredData.filter(
-            (turf) => turf.city.toLowerCase() === city.toLowerCase(),
-          );
-        }
+  const { data: allTurfs = [], isLoading: isTurfsLoading } = useQuery({
+    queryKey: ["turfs"],
+    queryFn: async () => {
+      const res = await api.get("/turfs");
+      return res.data;
+    },
+  });
 
-        // 2. Filter by Availability
-        // Logic: A turf is available if the searched slot is NOT in the booked 'slots' object
-        if (selectedDate && slot) {
-          const dateObj = new Date(selectedDate);
-          const formattedDate = dateObj.toLocaleDateString("en-GB"); // "DD/MM/YYYY" matching your JSON keys
-
-          console.log("🔍 RAW selectedDate:", selectedDate);
-          console.log("🔍 Formatted Date:", formattedDate, "| Slot:", slot);
-
-          filteredData = filteredData.filter((turf) => {
-            const bookedSlotsForDate = turf.slots[formattedDate] || [];
-
-            // Parse the selected slot (e.g., "12-13" -> start: 12, end: 13)
-            const [slotStart, slotEnd] = slot.split("-").map(Number);
-
-            // Check if this exact slot is booked
-            const isBooked = bookedSlotsForDate.some(
-              (s) => s.start === slotStart && s.end === slotEnd,
-            );
-
-            console.log(
-              `📍 ${turf.name} (${turf.city}):`,
-              `\n  - Slot dates in data: [${Object.keys(turf.slots).join(", ")}]`,
-              `\n  - Booked for ${formattedDate}:`,
-              bookedSlotsForDate,
-              `\n  - Searching: ${slotStart}-${slotEnd}`,
-              `\n  - IsBooked: ${isBooked}`,
-              `\n  - WillShow: ${!isBooked}`,
-            );
-
-            return !isBooked; // Only show if NOT booked
-          });
-        }
-
-        setTurfs(filteredData);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch Error:", err);
-        setLoading(false);
+  const bookingMutation = useMutation({
+    mutationFn: async (payload) => {
+      const res = await api.post("/bookings", payload);
+      return res.data;
+    },
+    onSuccess: () => {
+      Swal.fire({
+        title: "Booking Secure",
+        text: "Mission objective achieved. Your arena is reserved.",
+        icon: "success",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#a3e635",
       });
-  }, [city, selectedDate, slot]);
+      navigate("/");
+    },
+    onError: (error) => {
+      console.error("Booking Error:", error);
+      Swal.fire({
+        title: "Booking Failed",
+        text: error.response?.data?.error || "Could not finalize the operation",
+        icon: "error",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
+    },
+  });
 
-  if (loading) {
+  // Client-side filtering
+  const turfs = React.useMemo(() => {
+    let filteredData = allTurfs;
+
+    // 1. Filter by City
+    if (city && city !== "All") {
+      filteredData = filteredData.filter(
+        (turf) => turf.city.toLowerCase() === city.toLowerCase(),
+      );
+    }
+
+    // 2. Filter by Availability
+    if (selectedDate && slot) {
+      const dateObj = new Date(selectedDate);
+      const formattedDate = dateObj.toLocaleDateString("en-GB");
+      const [slotStart, slotEnd] = slot.split("-").map(Number);
+
+      filteredData = filteredData.filter((turf) => {
+        const bookedSlotsForDate = turf.slots[formattedDate] || [];
+        const isBooked = bookedSlotsForDate.some(
+          (s) => s.start === slotStart && s.end === slotEnd,
+        );
+        return !isBooked;
+      });
+    }
+
+    return filteredData;
+  }, [allTurfs, city, selectedDate, slot]);
+
+  if (isTurfsLoading) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col justify-center items-center">
         <Activity className="text-lime-400 animate-spin mb-4" size={48} />
@@ -271,52 +277,13 @@ const Turfs = () => {
 
           const payload = {
             ...bookingData,
-            date: formattedDate, // Backend expects 'date'
+            date: formattedDate,
             paymentMethod: paymentInfo.method,
             transactionId: paymentInfo.transactionId,
             userEmail: user.email,
           };
 
-          try {
-            const res = await fetch(`${server_url}/bookings`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            const result = await res.json();
-            if (res.ok) {
-              await Swal.fire({
-                title: "Booking Secure",
-                text: "Mission objective achieved. Your arena is reserved.",
-                icon: "success",
-                background: "#050505",
-                color: "#fff",
-                confirmButtonColor: "#a3e635",
-              });
-              // Optionally refresh data to show updated slots
-              navigate("/"); // Redirect or refresh
-            } else {
-              Swal.fire({
-                title: "Booking Failed",
-                text: result.error,
-                icon: "error",
-                background: "#050505",
-                color: "#fff",
-                confirmButtonColor: "#ef4444",
-              });
-            }
-          } catch (error) {
-            console.error("Booking Error:", error);
-            Swal.fire({
-              title: "System Breach",
-              text: "Could not finalize the operation",
-              icon: "error",
-              background: "#050505",
-              color: "#fff",
-              confirmButtonColor: "#ef4444",
-            });
-          }
+          bookingMutation.mutate(payload);
         }}
       />
     </div>
