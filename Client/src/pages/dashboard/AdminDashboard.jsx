@@ -12,6 +12,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useAuth } from "../../Providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
@@ -58,6 +59,14 @@ const AdminDashboard = () => {
       });
 
       if (res.ok) {
+        Swal.fire({
+          title: "Success",
+          text: `Booking ${newStatus === "CONFIRMED" ? "confirmed" : "declined"} successfully`,
+          icon: "success",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#a3e635",
+        });
         // Update local state
         setBookings((prev) =>
           prev.map((b) =>
@@ -66,21 +75,42 @@ const AdminDashboard = () => {
         );
       } else {
         const errorData = await res.json();
-        alert("Failed to update status: " + errorData.error);
+        Swal.fire({
+          title: "Error",
+          text: errorData.error,
+          icon: "error",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#ef4444",
+        });
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Error updating status");
+      Swal.fire({
+        title: "System Error",
+        text: "Could not connect to command center",
+        icon: "error",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
     }
   };
 
   const handleDelete = async (bookingId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to remove this booking and free the slot?",
-      )
-    )
-      return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This will remove the booking and free the slot permanently.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#374151",
+      confirmButtonText: "Yes, delete it!",
+      background: "#050505",
+      color: "#fff",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const res = await fetch(`${server_url}/bookings/${bookingId}`, {
@@ -88,14 +118,36 @@ const AdminDashboard = () => {
       });
 
       if (res.ok) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "Booking has been removed and slot is freed.",
+          icon: "success",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#a3e635",
+        });
         setBookings((prev) => prev.filter((b) => b.id !== bookingId));
       } else {
         const errorData = await res.json();
-        alert("Failed to delete: " + errorData.error);
+        Swal.fire({
+          title: "Error",
+          text: errorData.error,
+          icon: "error",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#ef4444",
+        });
       }
     } catch (error) {
       console.error("Error deleting:", error);
-      alert("Error deleting booking");
+      Swal.fire({
+        title: "System Error",
+        text: "Operation failed",
+        icon: "error",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
     }
   };
 

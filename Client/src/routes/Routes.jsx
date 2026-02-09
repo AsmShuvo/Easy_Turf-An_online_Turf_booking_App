@@ -9,6 +9,7 @@ import CreateTurf from "../pages/turfs/CreateTurf";
 import OrderHistory from "../pages/orderHistory/OrderHistory";
 import DashboardLayout from "../Layout/DashboardLayout";
 import AdminDashboard from "../pages/dashboard/AdminDashboard";
+import PrivateRoute from "./PrivateRoute";
 
 export const routes = createBrowserRouter([
   {
@@ -41,7 +42,11 @@ export const routes = createBrowserRouter([
       },
       {
         path: "/order-history",
-        element: <OrderHistory />,
+        element: (
+          <PrivateRoute>
+            <OrderHistory />
+          </PrivateRoute>
+        ),
       },
     ],
   },

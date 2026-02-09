@@ -10,6 +10,7 @@ import {
   Activity,
 } from "lucide-react";
 import { useAuth } from "../../Providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -64,15 +65,37 @@ const Register = () => {
             response.status,
             errorText,
           );
-          alert(`Database Sync Failed: ${response.status} - ${errorText}`);
+          Swal.fire({
+            title: "Database Out of Sync",
+            text: `Local setup completed but remote sync failed: ${response.status}`,
+            icon: "warning",
+            background: "#050505",
+            color: "#fff",
+            confirmButtonColor: "#f59e0b",
+          });
         } else {
           console.log("User synced to database successfully");
         }
       } catch (dbError) {
         console.error("Database sync error:", dbError);
-        alert(`Database Connection Error: ${dbError.message}`);
+        Swal.fire({
+          title: "Connection Error",
+          text: "Identity verified but database link offline",
+          icon: "error",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#ef4444",
+        });
       }
 
+      await Swal.fire({
+        title: "Account Created",
+        text: "You have been successfully enlisted in Turf King.",
+        icon: "success",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#a3e635",
+      });
       navigate("/");
     } catch (err) {
       setError("Failed to create account: " + err.message);

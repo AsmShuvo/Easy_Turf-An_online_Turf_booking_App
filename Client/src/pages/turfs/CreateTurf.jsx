@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const CreateTurf = () => {
   const navigate = useNavigate();
@@ -46,14 +47,36 @@ const CreateTurf = () => {
       });
 
       if (res.ok) {
+        await Swal.fire({
+          title: "Arena Active",
+          text: "Tactical deployment completed successfully.",
+          icon: "success",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#a3e635",
+        });
         navigate("/turfs");
       } else {
         const errorData = await res.json();
-        alert("Failed to create turf: " + errorData.error);
+        Swal.fire({
+          title: "Deployment Failed",
+          text: errorData.error,
+          icon: "error",
+          background: "#050505",
+          color: "#fff",
+          confirmButtonColor: "#ef4444",
+        });
       }
     } catch (error) {
       console.error("Error creating turf:", error);
-      alert("Error creating turf");
+      Swal.fire({
+        title: "System Error",
+        text: "Command rejected by server",
+        icon: "error",
+        background: "#050505",
+        color: "#fff",
+        confirmButtonColor: "#ef4444",
+      });
     } finally {
       setUploading(false);
     }

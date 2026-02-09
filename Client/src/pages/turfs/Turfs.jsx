@@ -11,6 +11,7 @@ import {
 import BookingModal from "../../components/BookingModal";
 import PaymentModal from "../../components/PaymentModal";
 import { useAuth } from "../../Providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const Turfs = () => {
   const { user } = useAuth();
@@ -285,15 +286,36 @@ const Turfs = () => {
 
             const result = await res.json();
             if (res.ok) {
-              alert(result.message);
+              await Swal.fire({
+                title: "Booking Secure",
+                text: "Mission objective achieved. Your arena is reserved.",
+                icon: "success",
+                background: "#050505",
+                color: "#fff",
+                confirmButtonColor: "#a3e635",
+              });
               // Optionally refresh data to show updated slots
               navigate("/"); // Redirect or refresh
             } else {
-              alert("Booking Failed: " + result.error);
+              Swal.fire({
+                title: "Booking Failed",
+                text: result.error,
+                icon: "error",
+                background: "#050505",
+                color: "#fff",
+                confirmButtonColor: "#ef4444",
+              });
             }
           } catch (error) {
             console.error("Booking Error:", error);
-            alert("Something went wrong!");
+            Swal.fire({
+              title: "System Breach",
+              text: "Could not finalize the operation",
+              icon: "error",
+              background: "#050505",
+              color: "#fff",
+              confirmButtonColor: "#ef4444",
+            });
           }
         }}
       />

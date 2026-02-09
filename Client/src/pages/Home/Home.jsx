@@ -154,14 +154,18 @@ const Home = () => {
 
               <button
                 onClick={handleSearch}
-                className="w-full py-5 bg-lime-400 hover:bg-lime-300 text-black font-black uppercase tracking-widest rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_-5px_rgba(163,230,53,0.5)]"
+                disabled={!selectedDate || !city || !slot}
+                className={`w-full py-5 font-black uppercase tracking-widest rounded-xl transition-all transform shadow-[0_0_30px_-5px_rgba(163,230,53,0.5)] ${
+                  !selectedDate || !city || !slot
+                    ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
+                    : "bg-lime-400 hover:bg-lime-300 text-black hover:scale-[1.02] active:scale-95"
+                }`}
               >
                 Search
               </button>
             </div>
           </div>
 
-          {/* Right Action Image */}
           <div className="lg:col-span-3 group relative hidden lg:block overflow-hidden rounded-3xl border border-white/10">
             <img
               src={imgRight}
@@ -176,7 +180,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Footer Decoration */}
       <div className="flex justify-center pb-10 opacity-20">
         <p className="text-xs tracking-[0.5em] uppercase">
           Professional Sports Booking Engine

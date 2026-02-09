@@ -27,10 +27,10 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "History", path: "/order-history" },
+    { name: "Current Status", path: "/order-history" },
   ];
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <nav
@@ -44,9 +44,7 @@ const Navbar = () => {
         }`}
       >
         <div className="relative group">
-          {/* Animated Border Glow behind the bar */}
           <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-lime-400/10 to-transparent rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity" />
-
           <div className="relative flex items-center justify-between bg-black/60 backdrop-blur-2xl border border-white/10 px-6 md:px-10 py-4 rounded-2xl shadow-2xl">
             {/* LEFT: LOGO */}
             <Link to="/" className="flex items-center space-x-2 group/logo">
@@ -58,7 +56,7 @@ const Navbar = () => {
               </span>
             </Link>
 
-            {/* CENTER: NAV LINKS */}
+            {/* nav links*/}
             <div className="hidden lg:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <Link
@@ -72,11 +70,11 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* RIGHT: AUTH & STATUS */}
+            {/* auth */}
             <div className="hidden md:flex items-center space-x-6">
               {user ? (
                 <>
-                  {/* User Profile Info */}
+                  {/* User Info */}
                   <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl">
                     <div className="w-6 h-6 bg-lime-400 rounded-md flex items-center justify-center">
                       <User size={14} className="text-black" />
@@ -91,7 +89,6 @@ const Navbar = () => {
                     </div>
                   </div>
 
-                  {/* Logout Button */}
                   <button
                     onClick={() => signout()}
                     className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-red-500 transition-colors"
@@ -102,7 +99,6 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  {/* Login Link */}
                   <Link
                     to="/login"
                     className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 hover:text-white transition-colors"
@@ -111,7 +107,6 @@ const Navbar = () => {
                     <span>Login</span>
                   </Link>
 
-                  {/* Register Button */}
                   <Link
                     to="/register"
                     className="relative group/btn overflow-hidden rounded-lg"
@@ -125,13 +120,11 @@ const Navbar = () => {
                 </>
               )}
 
-              {/* System pulse */}
               <div className="flex items-center pl-4 border-l border-white/10">
                 <Activity size={16} className="text-lime-500 animate-pulse" />
               </div>
             </div>
 
-            {/* MOBILE TOGGLE */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden text-white hover:text-lime-400 transition-colors"
@@ -141,7 +134,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
         <div
           className={`lg:hidden absolute top-full left-0 w-full mt-4 transition-all duration-300 origin-top ${
             isOpen
