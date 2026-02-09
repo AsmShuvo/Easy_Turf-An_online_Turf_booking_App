@@ -29,4 +29,24 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser };
+const getUser = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch user" });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+};
+
+module.exports = { createUser, getUser, getAllUsers };

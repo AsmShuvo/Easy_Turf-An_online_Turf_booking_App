@@ -21,7 +21,24 @@ const Login = () => {
       setError("");
       setIsSubmitting(true);
       await login(email, password);
-      navigate("/"); // Redirect to home or dashboard
+
+      // Fetch role to decide redirect
+      // Note: login() updates auth state, but we might need to fetch role manually here
+      // or rely on a slight delay/check.
+      // Better: fetch role directly here for immediate decision.
+      const response = await fetch(`http://localhost:3000/users/${email}`);
+      if (response.ok) {
+        const dbUser = await response.json();
+        console.log("User: ", dbUser);
+        if (dbUser.role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/");
+        }
+      } else {
+        // Fallback if fetch fails
+        navigate("/");
+      }
     } catch (err) {
       setError("Failed to log in: " + err.message);
     } finally {

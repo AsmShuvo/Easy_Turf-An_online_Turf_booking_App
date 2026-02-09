@@ -7,6 +7,8 @@ import Login from "../pages/login/Login";
 import Turfs from "../pages/turfs/Turfs";
 import CreateTurf from "../pages/turfs/CreateTurf";
 import OrderHistory from "../pages/orderHistory/OrderHistory";
+import DashboardLayout from "../Layout/DashboardLayout";
+import AdminDashboard from "../pages/dashboard/AdminDashboard";
 
 export const routes = createBrowserRouter([
   {
@@ -40,6 +42,16 @@ export const routes = createBrowserRouter([
       {
         path: "/order-history",
         element: <OrderHistory />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
       },
     ],
   },

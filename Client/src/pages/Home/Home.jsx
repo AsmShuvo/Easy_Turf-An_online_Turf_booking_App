@@ -9,7 +9,14 @@ const Home = () => {
   const [city, setCity] = useState("");
   const [slot, setSlot] = useState("");
 
-  const cities = ["Banani", "Gulshan", "Uttara", "Dhanmondi", "Mirpur"];
+  const cities = [
+    "Banani",
+    "Badda",
+    "Gulshan",
+    "Uttara",
+    "Dhanmondi",
+    "Mirpur",
+  ];
   const slots = [
     "10-11",
     "11-12",

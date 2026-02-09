@@ -9,6 +9,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 // Force restart for Prisma Client update (No default values)
 
+// Force restart for Admin updates
+// Force restart for Admin updates
 app.use(cors());
 app.use(express.json());
 

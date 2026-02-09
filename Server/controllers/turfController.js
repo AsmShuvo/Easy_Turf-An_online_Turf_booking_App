@@ -42,9 +42,17 @@ const createTurf = async (req, res) => {
 
 const getAllTurfs = async (req, res) => {
   try {
+    const { ownerId } = req.query;
+    const where = {};
+    if (ownerId) where.ownerId = ownerId;
+
     const turfs = await prisma.turf.findMany({
+      where,
       orderBy: {
         createdAt: "desc",
+      },
+      include: {
+        bookings: true, // Optionally include bookings count/details if needed
       },
     });
     res.status(200).json(turfs);
