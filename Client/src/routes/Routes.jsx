@@ -6,6 +6,7 @@ import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
 import Turfs from "../pages/turfs/Turfs";
 import CreateTurf from "../pages/turfs/CreateTurf";
+import OrderHistory from "../pages/orderHistory/OrderHistory";
 
 export const routes = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ export const routes = createBrowserRouter([
       {
         path: "/create-turf",
         element: <CreateTurf />,
+      },
+      {
+        path: "/order-history",
+        element: <OrderHistory />,
       },
     ],
   },

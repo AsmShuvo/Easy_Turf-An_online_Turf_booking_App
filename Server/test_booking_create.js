@@ -30,8 +30,12 @@ const options = {
 
 const req = http.request(options, (res) => {
   console.log(`STATUS: ${res.statusCode}`);
-  res.on("data", (d) => {
-    process.stdout.write(d);
+  let responseBody = "";
+  res.on("data", (chunk) => {
+    responseBody += chunk;
+  });
+  res.on("end", () => {
+    console.log("Response Body:", responseBody);
   });
 });
 

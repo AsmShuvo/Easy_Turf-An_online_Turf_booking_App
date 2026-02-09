@@ -70,7 +70,9 @@ const createBooking = async (req, res) => {
           slot,
           paymentMethod,
           transactionId,
-          status: "CONFIRMED",
+          ownerId: turf.ownerId,
+          ownerName: turf.ownerName,
+          status: "PENDING",
         },
       }),
     ]);
@@ -86,4 +88,33 @@ const createBooking = async (req, res) => {
   }
 };
 
-module.exports = { createBooking };
+const getUserBookings = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const bookings = await prisma.booking.findMany({
+      where: { userId: user.id },
+      include: {
+        turf: true, // Include turf details
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    res.status(500).json({ error: "Failed to fetch bookings" });
+  }
+};
+
+module.exports = { createBooking, getUserBookings };

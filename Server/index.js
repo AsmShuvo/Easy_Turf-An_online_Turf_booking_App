@@ -6,7 +6,8 @@ const { query } = require("./db/db"); // Import the query function from db.js
 const cors = require("cors");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+// Force restart for Prisma Client update (No default values)
 
 app.use(cors());
 app.use(express.json());

@@ -39,6 +39,8 @@ model Booking {
   slot          String   // "12-13"
   paymentMethod String
   transactionId String?
-  status        String   @default("CONFIRMED")
+  ownerId       String
+  ownerName     String
+  status        String   @default("PENDING")
   createdAt     DateTime @default(now())
 }
