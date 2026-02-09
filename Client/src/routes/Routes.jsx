@@ -5,6 +5,7 @@ import About from "../pages/About/About";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
 import Turfs from "../pages/turfs/Turfs";
+import CreateTurf from "../pages/turfs/CreateTurf";
 
 export const routes = createBrowserRouter([
   {
@@ -25,11 +26,15 @@ export const routes = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login/>
+        element: <Login />,
       },
       {
         path: "/turfs",
-        element: <Turfs/>
+        element: <Turfs />,
+      },
+      {
+        path: "/create-turf",
+        element: <CreateTurf />,
       },
     ],
   },

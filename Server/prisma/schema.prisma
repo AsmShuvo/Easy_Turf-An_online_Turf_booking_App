@@ -13,3 +13,16 @@ model User {
   password  String
   createdAt DateTime @default(now())
 }
+
+model Turf {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  address   String
+  ownerId   String
+  ownerName String
+  rent      Float
+  image     String
+  slots     Json     @default("{}")
+  createdAt DateTime @default(now())
+}

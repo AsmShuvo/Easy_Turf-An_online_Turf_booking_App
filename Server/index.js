@@ -14,6 +14,9 @@ app.use(express.json());
 const userRoutes = require("./routes/userRoutes");
 app.use("/users", userRoutes);
 
+const turfRoutes = require("./routes/turfRoutes");
+app.use("/turfs", turfRoutes);
+
 // Example endpoint that queries the database
 app.get("/users", async (req, res) => {
   try {

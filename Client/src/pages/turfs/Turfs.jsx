@@ -19,13 +19,16 @@ const Turfs = () => {
   const [selectedTurf, setSelectedTurf] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Destructure state passed from Home search
   const { city, selectedDate, slot } = location.state || {};
-
+  const server_url = import.meta.env.VITE_SERVER_URL;
   useEffect(() => {
-    // Note: Ensure your data is in public/data/turfs.json
-    fetch("/data/turfs.json")
-      .then((res) => res.json())
+    fetch(`${server_url}/turfs`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         let filteredData = data;
 
@@ -127,6 +130,13 @@ const Turfs = () => {
           >
             <Search size={16} />
             <span>Modify Search</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/create-turf")}
+            className="flex items-center space-x-2 text-xs font-black uppercase tracking-widest text-lime-400 hover:text-white transition-colors border border-lime-400/30 px-4 py-2 rounded-lg"
+          >
+            <span>Register New Arena</span>
           </button>
         </div>
       </div>
