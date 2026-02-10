@@ -42,6 +42,7 @@ model Booking {
   transactionId String?
   ownerId       String
   ownerName     String
+  price         Float    @default(0)
   status        String   @default("PENDING")
   createdAt     DateTime @default(now())
 }

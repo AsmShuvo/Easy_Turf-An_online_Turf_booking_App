@@ -9,6 +9,7 @@ import CreateTurf from "../pages/turfs/CreateTurf";
 import OrderHistory from "../pages/orderHistory/OrderHistory";
 import DashboardLayout from "../Layout/DashboardLayout";
 import AdminDashboard from "../pages/dashboard/AdminDashboard";
+import Analytics from "../pages/dashboard/Analytics";
 import PrivateRoute from "./PrivateRoute";
 
 export const routes = createBrowserRouter([
@@ -57,6 +58,10 @@ export const routes = createBrowserRouter([
       {
         index: true,
         element: <AdminDashboard />,
+      },
+      {
+        path: "analytics",
+        element: <Analytics />,
       },
     ],
   },

@@ -72,6 +72,7 @@ const createBooking = async (req, res) => {
           transactionId,
           ownerId: turf.ownerId,
           ownerName: turf.ownerName,
+          price: turf.rent,
           status: "PENDING",
         },
       }),

@@ -7,6 +7,7 @@ import {
   Calendar,
   Users,
   Settings,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "../Providers/AuthProvider";
 
@@ -52,26 +53,35 @@ const DashboardLayout = () => {
         <nav className="flex-1 px-4 py-8 space-y-2">
           <Link
             to="/dashboard"
-            className="flex items-center space-x-3 px-4 py-3 bg-lime-400/10 text-lime-400 rounded-xl border border-lime-400/20"
+            className="flex items-center space-x-3 px-4 py-3 hover:text-white hover:bg-white/5 text-gray-400 rounded-xl transition-colors"
           >
             <LayoutDashboard size={18} />
             <span className="text-xs font-black uppercase tracking-widest">
               Overview
             </span>
           </Link>
+          <Link
+            to="/dashboard/analytics"
+            className="flex items-center space-x-3 px-4 py-3 bg-lime-400/10 text-lime-400 rounded-xl border border-lime-400/20"
+          >
+            <BarChart3 size={18} />
+            <span className="text-xs font-black uppercase tracking-widest">
+              Analytics
+            </span>
+          </Link>
           {/* Placeholder links for future */}
           <div className="flex items-center space-x-3 px-4 py-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
             <Calendar size={18} />
             <span className="text-xs font-black uppercase tracking-widest">
-              Bookings
+              Support
             </span>
           </div>
-          <div className="flex items-center space-x-3 px-4 py-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
+          {/* <div className="flex items-center space-x-3 px-4 py-3 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-colors cursor-pointer">
             <Users size={18} />
             <span className="text-xs font-black uppercase tracking-widest">
               Users
             </span>
-          </div>
+          </div> */}
         </nav>
 
         {/* User Info & Logout */}
