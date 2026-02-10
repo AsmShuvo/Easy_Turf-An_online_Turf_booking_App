@@ -10,14 +10,15 @@ EasyTurf is a high-performance, full-stack web application designed for seamless
 
 ### 🛡️ For Admins (Command Center)
 
-- **Arena Management**: Register new turfs with detailed amenities, pricing, and locations.
+- **Arena Management**: Register new turfs with detailed amenities, pricing and locations.
 - **Operational Overview**: Real-time dashboard to monitor pending and confirmed bookings.
 - **Dynamic Scheduling**: Automated slot management that prevents double-bookings at the database level.
 - **Mission Control**: Confirm or decline bookings with immediate user notifications.
+- **Analytics**: Advanced analytics dashboard tracking revenue trajectory, peak hours and weekly engagement.
 
 ### ⚽ For Users (Arena Operation)
 
-- **Tactical Search**: Filter arenas by city, date, and available time slots.
+- **Tactical Search**: Filter arenas by city, date and available time slots.
 - **Secure Booking**: Integrated payment flow with transaction verification.
 - **Mission Logs**: Complete history of past and upcoming bookings with status tracking.
 - **Identity Security**: Firebase-powered authentication synchronized with a dedicated PostgreSQL user profile.
@@ -30,6 +31,7 @@ EasyTurf is a high-performance, full-stack web application designed for seamless
 
 - **Framework**: React.js + Vite
 - **Data Fetching**: TanStack Query (React Query)
+- **Visualization**: Recharts
 - **HTTP Client**: Axios
 - **Styling**: Tailwind CSS + Tactical Dark UI
 - **Icons**: Lucide React
@@ -110,4 +112,4 @@ Open two terminals:
 
 This project is licensed under the ISC License.
 
-Developed with ⚔️ by **AsmShuvo**
+Developed by **AsmShuvo**
