@@ -108,6 +108,8 @@ Open two terminals:
 
 ---
 
+### Admin Login: Email: admin@gmail.com Pass: Aa1111
+
 ## 📄 License
 
 This project is licensed under the ISC License.
