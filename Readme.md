@@ -109,6 +109,7 @@ Open two terminals:
 ---
 
 ### Admin Login: Email: admin@gmail.com Pass: Aa1111
+- You have to set your own on db
 
 ## 📄 License
 
