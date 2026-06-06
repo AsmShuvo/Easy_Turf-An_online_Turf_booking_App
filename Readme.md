@@ -40,7 +40,7 @@ EasyTurf is a high-performance, full-stack web application designed for seamless
 
 ### Backend (Server)
 
-- **Environment**: Node.js + Express.js
+- **Environment**: Node.js + Express.js + JWT Auth
 - **ORM**: Prisma
 - **Database**: PostgreSQL
 - **Architecture**: Modular Controller/Route structure
